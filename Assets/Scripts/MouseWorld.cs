@@ -17,6 +17,4 @@ public class MouseWorld : MonoBehaviour
         Physics.Raycast(ray, out var raycastHit, float.MaxValue, _instance.mousePlaneLayerMask);
         return raycastHit.point;
     }
-    
-    
 }

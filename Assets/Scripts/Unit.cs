@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Unit : MonoBehaviour
@@ -6,6 +7,11 @@ public class Unit : MonoBehaviour
     private Vector3 _targetPosition;
     private const string IsWalking = "IsWalking";
     private bool _isWalking;
+
+    private void Awake()
+    {
+        _targetPosition = transform.position;
+    }
 
     private void Update()
     {
@@ -25,12 +31,9 @@ public class Unit : MonoBehaviour
             _isWalking = false;
         
         unitAnimator.SetBool(IsWalking, _isWalking);
-
-        if (Input.GetMouseButtonDown(0))
-            Move(MouseWorld.GetPosition());
     }
 
-    private void Move(Vector3 targetPosition)
+    public void Move(Vector3 targetPosition)
     {
         _targetPosition = targetPosition;
     }
