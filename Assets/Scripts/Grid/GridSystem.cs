@@ -5,7 +5,7 @@ public class GridSystem : MonoBehaviour
     private readonly int _width;
     private readonly int _height;
     private readonly float _cellSize;
-    private GridObject[,] _gridObjects;
+    private readonly GridObject[,] _gridObjects;
 
     public GridSystem(int width, int height, float cellSize)
     {
@@ -25,7 +25,7 @@ public class GridSystem : MonoBehaviour
     }
     
 
-    private Vector3 GetWorldPosition(GridPosition gridPosition)
+    public Vector3 GetWorldPosition(GridPosition gridPosition)
     {
         return new Vector3(gridPosition.X, 0, gridPosition.Z) * _cellSize;
     }
@@ -56,5 +56,11 @@ public class GridSystem : MonoBehaviour
     public GridObject GetGridObject(GridPosition gridPosition)
     {
         return _gridObjects[gridPosition.X, gridPosition.Z];
+    }
+    
+    
+    public bool IsValidGridPosition(GridPosition gridPosition)
+    {
+        return (gridPosition.X >= 0 && gridPosition.X < _width) && (gridPosition.Z >= 0 && gridPosition.Z < _height);
     }
 }
