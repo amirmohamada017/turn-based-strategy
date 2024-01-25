@@ -179,6 +179,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitAnimator: {fileID: 5425762388307108119}
+  maxMoveDistance: 2
 --- !u!1001 &161722826279818975
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -63,4 +63,14 @@ public class GridSystem : MonoBehaviour
     {
         return (gridPosition.X >= 0 && gridPosition.X < _width) && (gridPosition.Z >= 0 && gridPosition.Z < _height);
     }
+
+    public int GetWith()
+    {
+        return _width;
+    }
+
+    public int GetHeight()
+    {
+        return _height;
+    }
 }

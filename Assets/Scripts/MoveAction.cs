@@ -55,9 +55,9 @@ public class MoveAction : MonoBehaviour
         var validGridPositions = new List<GridPosition>();
         var unitGridPosition = _unit.GetGridPosition();
 
-        for (var x = -maxMoveDistance; x < maxMoveDistance; x++)
+        for (var x = -maxMoveDistance; x <= maxMoveDistance; x++)
         {
-            for (var z = -maxMoveDistance; z < maxMoveDistance; z++)
+            for (var z = -maxMoveDistance; z <= maxMoveDistance; z++)
             {
                 var offsetGridPosition = new GridPosition(x, z);
                 var testGridPosition = unitGridPosition + offsetGridPosition;
