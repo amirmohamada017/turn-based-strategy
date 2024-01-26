@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,6 +36,7 @@ public class MoveAction : BaseAction
         {
             _isWalking = false;
             isActive = false;
+            onActionComplete();
         }
 
         const float rotateSpeed = 10f;
@@ -43,8 +45,9 @@ public class MoveAction : BaseAction
         unitAnimator.SetBool(IsWalking, _isWalking);
     }
 
-    public void Move(GridPosition gridPosition)
+    public void Move(GridPosition gridPosition, Action onActionComplete)
     {
+        this.onActionComplete = onActionComplete;
         _targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
         isActive = true;
     }
