@@ -31,6 +31,8 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (_isBusy) return;
         
+        if (!TurnSystem.Instance.IsPlayerTurn()) return;
+        
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
         if (HandleUnitSelection()) return;
@@ -69,22 +71,26 @@ public class UnitActionSystem : MonoBehaviour
     
     private bool HandleUnitSelection()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0))
+            return false;
+        
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out var raycastHit, float.MaxValue, unitLayerMask))
         {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out var raycastHit, float.MaxValue, unitLayerMask))
+            if (raycastHit.transform.TryGetComponent<Unit>(out var unit))
             {
-                if (raycastHit.transform.TryGetComponent<Unit>(out var unit))
-                {
-                    if (unit == selectedUnit)
-                        return false;
+                if (unit == selectedUnit)
+                    return false;
 
-                    SetSelectedUnit(unit);
-                    return true;
-                }
+                if (unit.IsEnemy())
+                    return false;
+
+                SetSelectedUnit(unit);
+                return true;
             }
         }
+        
         return false;
     }
 

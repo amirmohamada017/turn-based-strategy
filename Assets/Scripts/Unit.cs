@@ -4,6 +4,8 @@ using UnityEngine;
 public class Unit : MonoBehaviour
 { 
     public static event EventHandler OnAnyActionPointsChanged;
+
+    [SerializeField] private bool isEnemy;
     
     private const int ActionPointsMax = 2;
     private GridPosition _gridPosition;
@@ -91,8 +93,18 @@ public class Unit : MonoBehaviour
     
     private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {
-        _actionPoints = ActionPointsMax;
-        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        var isPlayerTurn = TurnSystem.Instance.IsPlayerTurn();
+        if ((IsEnemy() && !isPlayerTurn) || (!IsEnemy() && isPlayerTurn))
+        {
+            _actionPoints = ActionPointsMax;
+            OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        }
+        
+    }
+
+    public bool IsEnemy()
+    {
+        return isEnemy;
     }
 }
 
