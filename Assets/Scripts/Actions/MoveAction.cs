@@ -35,8 +35,7 @@ public class MoveAction : BaseAction
         else
         {
             _isWalking = false;
-            isActive = false;
-            onActionComplete();
+            ActionComplete();
         }
 
         const float rotateSpeed = 10f;
@@ -47,9 +46,9 @@ public class MoveAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        this.onActionComplete = onActionComplete;
+        ActionStart(onActionComplete);
+        
         _targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
-        isActive = true;
     }
     
     public override List<GridPosition> GetValidActionGridPositions()
