@@ -4,13 +4,12 @@ using UnityEngine;
 
 public class MoveAction : BaseAction
 {
-    [SerializeField] private Animator unitAnimator;
+    public event EventHandler OnStartMoving;
+    public event EventHandler OnStopMoving;
+    
     [SerializeField] private int maxMoveDistance = 4;
     
     private Vector3 _targetPosition;
-    
-    private const string IsWalking = "IsWalking";
-    private bool _isWalking;
     
     protected override void Awake()
     {
@@ -29,19 +28,15 @@ public class MoveAction : BaseAction
         {
             const float moveSpeed = 4f; 
             transform.position += moveDirection * (moveSpeed * Time.deltaTime);
-            
-            _isWalking = true;
         }
         else
         {
-            _isWalking = false;
             ActionComplete();
+            OnStopMoving?.Invoke(this, EventArgs.Empty);
         }
 
         const float rotateSpeed = 10f;
         transform.forward = Vector3.Lerp(transform.forward, moveDirection, Time.deltaTime*rotateSpeed);
-        
-        unitAnimator.SetBool(IsWalking, _isWalking);
     }
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
@@ -49,6 +44,8 @@ public class MoveAction : BaseAction
         ActionStart(onActionComplete);
         
         _targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
+        
+        OnStartMoving?.Invoke(this, EventArgs.Empty);
     }
     
     public override List<GridPosition> GetValidActionGridPositions()
