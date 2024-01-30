@@ -23,6 +23,7 @@ public class ShootAction : BaseAction
     private const float AimingStateTime = 1f;
     private const float ShootingStateTime = .1f;
     private const float CoolOffStateTime = .5f;
+    private const int DamageAmount = 40;
     private Unit _targetUnit;
     private State _state;
     private float _stateTimer;
@@ -65,7 +66,7 @@ public class ShootAction : BaseAction
             targetUnit = _targetUnit,
             shootingUnit = unit
         });
-        _targetUnit.Damage();
+        _targetUnit.Damage(DamageAmount);
     }
 
     private void NextState()
