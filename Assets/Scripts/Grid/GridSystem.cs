@@ -1,25 +1,28 @@
+using System;
 using UnityEngine;
 
-public class GridSystem : MonoBehaviour
+
+public class GridSystem<TGridObject>
 {
     private readonly int _width;
     private readonly int _height;
     private readonly float _cellSize;
-    private readonly GridObject[,] _gridObjects;
+    private readonly TGridObject[,] _gridObjects;
 
-    public GridSystem(int width, int height, float cellSize)
+    public GridSystem(int width, int height, float cellSize,
+        Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject)
     {
         _height = height;
         _width = width;
         _cellSize = cellSize;
-        _gridObjects = new GridObject[width, height];
+        _gridObjects = new TGridObject[width, height];
 
         for (var x = 0; x < _width; x++)
         {
             for (var z = 0; z < _height; z++)
             {
                 var gridPosition = new GridPosition(x, z);
-                _gridObjects[x, z] = new GridObject(this, gridPosition);
+                _gridObjects[x, z] = createGridObject(this, gridPosition);
             }
         }
     }
@@ -45,15 +48,14 @@ public class GridSystem : MonoBehaviour
             for (var z = 0; z < _height; z++)
             {
                 var gridPosition = new GridPosition(x, z);
-                var debugTransform = Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
+                var debugTransform = GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
                 var gridDebugObject = debugTransform.GetComponent<GridDebugObject>();
-                gridDebugObject.SetGridObject(GetGridObject(gridPosition));
-                
+                gridDebugObject.SetGridObject(GetGridObject(gridPosition) as GridObject);
             }
         }
     }
 
-    public GridObject GetGridObject(GridPosition gridPosition)
+    public TGridObject GetGridObject(GridPosition gridPosition)
     {
         return _gridObjects[gridPosition.X, gridPosition.Z];
     }
