@@ -74,17 +74,38 @@ public class EnemyAI : MonoBehaviour
 
     private bool TryTakeEnemyAIAction(Unit enemyUnit, Action onEnemyAIActionComplete)
     {
-        var spinAction = enemyUnit.GetSpinAction();
+        EnemyAIAction bestEnemyAIAction = null;
+        BaseAction bestBaseAction = null;
+        
+        foreach (var action in enemyUnit.GetActions())
+        {
+            if (!enemyUnit.CanSpendActionPointsToTakeAction(action))
+            {
+                continue;
+            }
 
-        var actionGridPosition = enemyUnit.GetGridPosition();
+            if (bestEnemyAIAction == null)
+            {
+                bestEnemyAIAction = action.GetBestEnemyAIAction();
+                bestBaseAction = action;
+            }
+            else
+            {
+                var testEnemyAIAction = action.GetBestEnemyAIAction();
+                if (testEnemyAIAction != null && testEnemyAIAction.actionValue > bestEnemyAIAction.actionValue)
+                {
+                    bestEnemyAIAction = action.GetBestEnemyAIAction();
+                    bestBaseAction = action;
+                }
+            }
+        }
 
-        if (!spinAction.IsValidActionGridPosition(actionGridPosition)) 
-            return false;
+        if (bestEnemyAIAction != null && enemyUnit.TrySpendActionPointsToTakeAction(bestBaseAction))
+        {
+            bestBaseAction.TakeAction(bestEnemyAIAction.gridPosition, onEnemyAIActionComplete);
+            return true;
+        }
 
-        if (!enemyUnit.TrySpendActionPointsToTakeAction(spinAction)) 
-            return false;
-            
-        spinAction.TakeAction(actionGridPosition, onEnemyAIActionComplete);
-        return true;
+        return false;
     }
 }
