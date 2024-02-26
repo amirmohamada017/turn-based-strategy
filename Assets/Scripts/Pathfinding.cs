@@ -9,6 +9,7 @@ public class Pathfinding : MonoBehaviour
     private const int MoveDiagonalCost = 14;
     
     [SerializeField] private Transform gridDebugObjectPrefab;
+    [SerializeField] private LayerMask obstaclesLayerMask;
     
     private GridSystem<PathNode> _gridSystem;
     private int _width;
@@ -18,10 +19,37 @@ public class Pathfinding : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+    }
+
+    public void SetUp(int width, int height, float cellSize)
+    {
+        _width = width;
+        _height = height;
+        _cellSize = cellSize;
         
-        _gridSystem = new GridSystem<PathNode>(10, 10, 2f,
+        _gridSystem = new GridSystem<PathNode>(_width, _height, _cellSize,
             (GridSystem<PathNode> gridSystem,GridPosition gridPosition) => new PathNode(gridPosition));
         _gridSystem.CreateDebugObjects(gridDebugObjectPrefab);
+
+        SetUnWalkableNodes();
+    }
+
+    private void SetUnWalkableNodes()
+    {
+        for (var x = 0; x < _width; x++)
+        {
+            for (var z = 0; z < _height; z++)
+            {
+                var gridPosition = new GridPosition(x, z);
+                var worldPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
+                const float raycastOffsetDistance = 5f;
+                if (Physics.Raycast(worldPosition + Vector3.down * raycastOffsetDistance, Vector3.up,
+                        raycastOffsetDistance * 2, obstaclesLayerMask))
+                {
+                    GetNode(x, z).SetIsWalkable(false);
+                }
+            }
+        }
     }
 
     public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition)
@@ -65,6 +93,12 @@ public class Pathfinding : MonoBehaviour
             {
                 if (closeList.Contains(neighbour))
                     continue;
+
+                if (!neighbour.IsWalkable())
+                {
+                    closeList.Add(neighbour);
+                    continue;
+                }
 
                 var tentativeGCost = currentNode.GetGCost() +
                                      CalculateDistance(currentNode.GetGridPosition(), neighbour.GetGridPosition());
