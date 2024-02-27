@@ -4,13 +4,6 @@ using UnityEngine;
 
 public class ShootAction : BaseAction
 {
-    private enum State
-    {
-        Aiming,
-        Shooting,
-        CoolOff,
-    }
-    
     public event EventHandler<OnShootEventArgs> OnShoot;
 
     public class OnShootEventArgs : EventArgs
@@ -18,7 +11,16 @@ public class ShootAction : BaseAction
         public Unit targetUnit;
         public Unit shootingUnit;
     }
+    
+    private enum State
+    {
+        Aiming,
+        Shooting,
+        CoolOff,
+    }
 
+    [SerializeField] private LayerMask obstaclesLayerMask;
+    
     private const int MaxShootDistance = 6;
     private const float AimingStateTime = 1f;
     private const float ShootingStateTime = .1f;
@@ -119,29 +121,27 @@ public class ShootAction : BaseAction
             {
                 var testDistance = Mathf.Abs(x) + Mathf.Abs(z);
                 if (MaxShootDistance < testDistance)
-                {
                     continue;
-                }
                 
                 var offsetGridPosition = new GridPosition(x, z);
                 var testGridPosition = unitGridPosition + offsetGridPosition;
                 
                 if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
-                {
                     continue;
-                }
                 
                 if (!LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition))
-                {
                     continue;
-                }
 
                 var targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
-                
                 if (targetUnit.IsEnemy() == unit.IsEnemy())
-                {
                     continue;
-                }
+
+                const float unitShoulderHeight = 1.7f;
+                var unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitGridPosition);
+                var shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
+                if (Physics.Raycast(unitWorldPosition + Vector3.up * unitShoulderHeight, shootDir,
+                        Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()), obstaclesLayerMask))
+                    continue;
                 
                 validGridPositions.Add(testGridPosition);
             }
