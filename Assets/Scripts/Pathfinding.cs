@@ -28,14 +28,9 @@ public class Pathfinding : MonoBehaviour
         _cellSize = cellSize;
         
         _gridSystem = new GridSystem<PathNode>(_width, _height, _cellSize,
-            (GridSystem<PathNode> gridSystem,GridPosition gridPosition) => new PathNode(gridPosition));
+            (GridSystem<PathNode> gridSystem, GridPosition gridPosition) => new PathNode(gridPosition));
         _gridSystem.CreateDebugObjects(gridDebugObjectPrefab);
-
-        SetUnWalkableNodes();
-    }
-
-    private void SetUnWalkableNodes()
-    {
+        
         for (var x = 0; x < _width; x++)
         {
             for (var z = 0; z < _height; z++)
@@ -51,7 +46,7 @@ public class Pathfinding : MonoBehaviour
             }
         }
     }
-
+    
     public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
     {
         var openList = new List<PathNode>();
@@ -59,16 +54,15 @@ public class Pathfinding : MonoBehaviour
 
         var startNode = _gridSystem.GetGridObject(startGridPosition);
         var endNode = _gridSystem.GetGridObject(endGridPosition);
-        openList.Add(startNode);
 
-        for (var x = 0; x < _gridSystem.GetWith(); x++)
+        for (var x = 0; x < _gridSystem.GetWidth(); x++)
         {
             for (var z = 0; z < _gridSystem.GetHeight(); z++)
             {
                 var gridPosition = new GridPosition(x, z);
                 var pathNode = _gridSystem.GetGridObject(gridPosition);
                 
-                pathNode.SetGCost(int.MaxValue);
+                pathNode.SetGCost(1000);
                 pathNode.SetHCost(0);
                 pathNode.CalculateFCost();
                 pathNode.ResetCameFromNode();
@@ -78,10 +72,12 @@ public class Pathfinding : MonoBehaviour
         startNode.SetGCost(0);
         startNode.SetHCost(CalculateDistance(startGridPosition, endGridPosition));
         startNode.CalculateFCost();
+        openList.Add(startNode);
+        
 
         while (openList.Count > 0)
         {
-            var currentNode = getLowestFCostPathNode(openList);
+            var currentNode = GetLowestFCostPathNode(openList);
 
             if (currentNode == endNode)
             {
@@ -92,31 +88,30 @@ public class Pathfinding : MonoBehaviour
             openList.Remove(currentNode);
             closeList.Add(currentNode);
 
-            foreach (var neighbour in GetNeighbours(currentNode))
+            var neighbours = GetNeighbours(currentNode);
+            foreach (var neighbour in neighbours)
             {
                 if (closeList.Contains(neighbour))
                     continue;
-
+                
                 if (!neighbour.IsWalkable())
                 {
                     closeList.Add(neighbour);
                     continue;
                 }
-
+                
                 var tentativeGCost = currentNode.GetGCost() +
                                      CalculateDistance(currentNode.GetGridPosition(), neighbour.GetGridPosition());
 
-                if (tentativeGCost > neighbour.GetGCost())
+                if (tentativeGCost < neighbour.GetGCost())
                 {
                     neighbour.SetCameFromPathNode(currentNode);
                     neighbour.SetGCost(tentativeGCost);
-                    neighbour.SetHCost(CalculateDistance(neighbour.GetGridPosition(), endNode.GetGridPosition()));
+                    neighbour.SetHCost(CalculateDistance(neighbour.GetGridPosition(), endGridPosition));
                     neighbour.CalculateFCost();
 
                     if (!openList.Contains(neighbour))
-                    {
                         openList.Add(neighbour);
-                    }
                 }
             }
         }
@@ -135,7 +130,7 @@ public class Pathfinding : MonoBehaviour
         return MoveDiagonalCost * Mathf.Min(xDistance, zDistance) + MoveStraightCost * remaining;
     }
 
-    private PathNode getLowestFCostPathNode(List<PathNode> pathNodes)
+    private PathNode GetLowestFCostPathNode(List<PathNode> pathNodes)
     {
         var lowestFCostPathNode = pathNodes[0];
         foreach (var t in pathNodes)
@@ -162,7 +157,7 @@ public class Pathfinding : MonoBehaviour
         {
             for (var j = -1; j < 2; j++)
             {
-                if (CheckValidPosition(i, j))
+                if (CheckValidPosition(gridPosition.X+i, gridPosition.Z+j))
                     neighbours.Add(GetNode(gridPosition.X + i, gridPosition.Z + j));
             }
         }
@@ -172,14 +167,13 @@ public class Pathfinding : MonoBehaviour
 
     private bool CheckValidPosition(int x, int z)
     {
-        return x >= 0 && x < _gridSystem.GetWith() && z >= 0 && z < _gridSystem.GetHeight() && !(x==0 && z==0);
+        return x >= 0 && x < _gridSystem.GetWidth() && z >= 0 && z < _gridSystem.GetHeight() && !(x==0 && z==0);
     }
 
-    private List<GridPosition> CalculatePath(PathNode node)
+    private List<GridPosition> CalculatePath(PathNode endNode)
     {
-        var nodes = new List<PathNode> { node };
-
-        var currentNode = node;
+        var nodes = new List<PathNode> { endNode };
+        var currentNode = endNode;
         
         while (currentNode.GetCameFromPathNode() != null)
         {

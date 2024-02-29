@@ -48,7 +48,8 @@ public class GridSystem<TGridObject>
             for (var z = 0; z < _height; z++)
             {
                 var gridPosition = new GridPosition(x, z);
-                var debugTransform = GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
+                var debugTransform =
+                    GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
                 var gridDebugObject = debugTransform.GetComponent<GridDebugObject>();
                 gridDebugObject.SetGridObject(GetGridObject(gridPosition));
             }
@@ -66,7 +67,7 @@ public class GridSystem<TGridObject>
         return (gridPosition.X >= 0 && gridPosition.X < _width) && (gridPosition.Z >= 0 && gridPosition.Z < _height);
     }
 
-    public int GetWith()
+    public int GetWidth()
     {
         return _width;
     }
