@@ -7,7 +7,9 @@ public class UnitRagdoll : MonoBehaviour
     public void SetUp(Transform originalRootBone)
     {
         MatchAllChileTransforms(ragdollRootBone, originalRootBone);
-        ApplyExplosionToRagdoll(ragdollRootBone, 200f, transform.position, 10f);
+        
+        var randomDir = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
+        ApplyExplosionToRagdoll(ragdollRootBone, 200f, transform.position + randomDir, 10f);
     }
 
     private void MatchAllChileTransforms(Transform root, Transform clone)
