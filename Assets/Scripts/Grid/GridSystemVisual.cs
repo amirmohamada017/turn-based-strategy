@@ -108,6 +108,27 @@ public class GridSystemVisual : MonoBehaviour
         
         ShowGridPositions(gridPositions, gridVisualType);
     }
+
+    private void ShowGridPositionRangeDiagonal(GridPosition gridPosition, int range, GridVisualType gridVisualType)
+    {
+        var gridPositions = new List<GridPosition>();
+        
+        for (var x = -range; x <= range; x++)
+        {
+            for (var z = -range; z <= range; z++)
+            {
+                var offsetGridPosition = new GridPosition(x, z);
+                var testGridPosition = gridPosition + offsetGridPosition;
+                
+                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                    continue;
+                
+                gridPositions.Add(testGridPosition);
+            }
+        }
+        
+        ShowGridPositions(gridPositions, gridVisualType);
+    }
     
     private void ShowGridPositions(List<GridPosition> gridPositions, GridVisualType gridVisualType)
     {
@@ -136,13 +157,22 @@ public class GridSystemVisual : MonoBehaviour
         {
             case ShootAction shootAction:
                 gridVisualType = GridVisualType.Red;
-                ShowGridPositionRange(unit.GetGridPosition(), shootAction.GetMaxShootDistance(), GridVisualType.RedSoft);
+                ShowGridPositionRange(unit.GetGridPosition(), shootAction.GetMaxShootDistance(),
+                    GridVisualType.RedSoft);
                 break;
             case MoveAction moveAction:
                 gridVisualType = GridVisualType.White;
                 break;
             case SpinAction spinAction:
                 gridVisualType = GridVisualType.Blue;
+                break;
+            case SwordAction swordAction:
+                gridVisualType = GridVisualType.Red;
+                ShowGridPositionRangeDiagonal(unit.GetGridPosition(), swordAction.GetMaxSwordDistance(),
+                    GridVisualType.RedSoft);
+                break;
+            case GrenadeAction grenadeAction:
+                gridVisualType = GridVisualType.Yellow;
                 break;
             default:
                 gridVisualType = GridVisualType.Yellow;
