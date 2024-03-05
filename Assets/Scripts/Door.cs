@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Door : MonoBehaviour
+public class Door : MonoBehaviour, IInteractable
 {
     private bool _isOpen = false;
     private bool _isActive;
@@ -18,7 +18,7 @@ public class Door : MonoBehaviour
     private void Start()
     {
         _gridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
-        LevelGrid.Instance.SetDoorAtGridPosition(_gridPosition, this);
+        LevelGrid.Instance.SetInteractableAtGridPosition(_gridPosition, this);
         Pathfinding.Instance.SetIsWalkableGridPosition(_gridPosition, _isOpen);
     }
 

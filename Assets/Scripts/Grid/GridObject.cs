@@ -5,7 +5,7 @@ public class GridObject
     private GridSystem<GridObject> _gridSystem;
     private readonly GridPosition _gridPosition;
     private List<Unit> _units;
-    private Door _door;
+    private IInteractable _interactable;
 
     public GridObject(GridSystem<GridObject> gridSystem, GridPosition gridPosition)
     {
@@ -50,13 +50,13 @@ public class GridObject
         return HasAnyUnit() ? _units[0] : null;
     }
     
-    public void SetDoor(Door door)
+    public IInteractable GetInteractable()
     {
-        _door = door;
+        return _interactable;
     }
     
-    public Door GetDoor()
+    public void SetInteractable(IInteractable interactable)
     {
-        return _door;
+        _interactable = interactable;
     }
 }
