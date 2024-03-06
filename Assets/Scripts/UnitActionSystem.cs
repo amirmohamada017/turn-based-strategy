@@ -42,7 +42,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private void HandleSelectedAction()
     {
-        if (InputManager.Instance.IsMouseButtonDown())
+        if (InputManager.Instance.IsMouseButtonDownThisFrame())
         {
             var mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
 
@@ -71,7 +71,7 @@ public class UnitActionSystem : MonoBehaviour
     
     private bool HandleUnitSelection()
     {
-        if (!InputManager.Instance.IsMouseButtonDown())
+        if (!InputManager.Instance.IsMouseButtonDownThisFrame())
             return false;
         
         var ray = Camera.main.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());
